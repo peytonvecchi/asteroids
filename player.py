@@ -1,33 +1,13 @@
 import pygame
+from shot import Shot
 from circleshape import CircleShape
-from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED
-
-"""
-# Base class for game objects
-class CircleShape(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius):
-        # we will be using this later
-        if hasattr(self, "containers"):
-            super().__init__(self.containers)
-        else:
-            super().__init__()
-
-        self.position = pygame.Vector2(x, y)
-        self.velocity = pygame.Vector2(0, 0)
-        self.radius = radius
-
-    def draw(self, screen):
-        # must override
-        pass
-
-    def update(self, dt):
-        # must override
-        pass
-"""
+from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, SHOT_RADIUS
 
 class Player(CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
+        self.x = x
+        self.y = y
         self.radius = radius
         self.rotation = 0
 
@@ -52,7 +32,12 @@ class Player(CircleShape):
         rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
         self.position += rotated_with_speed_vector
 
-    
+    def shoot(self):
+        shot = Shot(self.x, self.y, SHOT_RADIUS, self)
+        shot.velocity = pygame.Vector2(0, 1)
+        shot.velocity = shot.velocity.rotate(self.rotation)
+        shot.velocity *= PLAYER_SHOOT_SPEED
+
     def update(self, dt):
         keys = pygame.key.get_pressed()
 
@@ -64,3 +49,5 @@ class Player(CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(dt * -1)
+        if keys[pygame.K_SPACE]:
+            self.shoot()
